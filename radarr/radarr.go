@@ -17,17 +17,46 @@ import (
 type Radarr struct {
 	common service
 
-	Movie          *MovieService
-	MovieEditor    *MovieEditorService
-	MovieFile      *MovieFileService
-	Queue          *QueueService
-	History        *HistoryService
-	Calendar       *CalendarService
-	System         *SystemService
-	Tag            *TagService
-	QualityProfile *QualityProfileService
-	RootFolder     *RootFolderService
-	Command        *CommandService
+	AltTitle          *AltTitleService
+	AutoTagging       *AutoTaggingService
+	Blocklist         *BlocklistService
+	Calendar          *CalendarService
+	Collection        *CollectionService
+	Command           *CommandService
+	Config            *ConfigService
+	Credit            *CreditService
+	CustomFilter      *CustomFilterService
+	CustomFormat      *CustomFormatService
+	DelayProfile      *DelayProfileService
+	DownloadClient    *DownloadClientService
+	Exclusions        *ExclusionsService
+	ExtraFile         *ExtraFileService
+	Filesystem        *FilesystemService
+	History           *HistoryService
+	ImportList        *ImportListService
+	Indexer           *IndexerService
+	IndexerFlag       *IndexerFlagService
+	Language          *LanguageService
+	Localization      *LocalizationService
+	Log               *LogService
+	ManualImport      *ManualImportService
+	Metadata          *MetadataService
+	Movie             *MovieService
+	MovieEditor       *MovieEditorService
+	MovieFile         *MovieFileService
+	Notification      *NotificationService
+	Parse             *ParseService
+	QualityDefinition *QualityDefinitionService
+	QualityProfile    *QualityProfileService
+	Queue             *QueueService
+	Release           *ReleaseService
+	ReleaseProfile    *ReleaseProfileService
+	RemotePathMapping *RemotePathMappingService
+	Rename            *RenameService
+	RootFolder        *RootFolderService
+	System            *SystemService
+	Tag               *TagService
+	Wanted            *WantedService
 }
 
 type service struct {
@@ -93,17 +122,46 @@ func New(opts ...ClientOption) (*Radarr, error) {
 
 	r := &Radarr{}
 	r.common.client = rc
+	r.AltTitle = (*AltTitleService)(&r.common)
+	r.AutoTagging = (*AutoTaggingService)(&r.common)
+	r.Blocklist = (*BlocklistService)(&r.common)
+	r.Calendar = (*CalendarService)(&r.common)
+	r.Collection = (*CollectionService)(&r.common)
+	r.Command = (*CommandService)(&r.common)
+	r.Config = (*ConfigService)(&r.common)
+	r.Credit = (*CreditService)(&r.common)
+	r.CustomFilter = (*CustomFilterService)(&r.common)
+	r.CustomFormat = (*CustomFormatService)(&r.common)
+	r.DelayProfile = (*DelayProfileService)(&r.common)
+	r.DownloadClient = (*DownloadClientService)(&r.common)
+	r.Exclusions = (*ExclusionsService)(&r.common)
+	r.ExtraFile = (*ExtraFileService)(&r.common)
+	r.Filesystem = (*FilesystemService)(&r.common)
+	r.History = (*HistoryService)(&r.common)
+	r.ImportList = (*ImportListService)(&r.common)
+	r.Indexer = (*IndexerService)(&r.common)
+	r.IndexerFlag = (*IndexerFlagService)(&r.common)
+	r.Language = (*LanguageService)(&r.common)
+	r.Localization = (*LocalizationService)(&r.common)
+	r.Log = (*LogService)(&r.common)
+	r.ManualImport = (*ManualImportService)(&r.common)
+	r.Metadata = (*MetadataService)(&r.common)
 	r.Movie = (*MovieService)(&r.common)
 	r.MovieEditor = (*MovieEditorService)(&r.common)
 	r.MovieFile = (*MovieFileService)(&r.common)
+	r.Notification = (*NotificationService)(&r.common)
+	r.Parse = (*ParseService)(&r.common)
+	r.QualityDefinition = (*QualityDefinitionService)(&r.common)
+	r.QualityProfile = (*QualityProfileService)(&r.common)
 	r.Queue = (*QueueService)(&r.common)
-	r.History = (*HistoryService)(&r.common)
-	r.Calendar = (*CalendarService)(&r.common)
+	r.Release = (*ReleaseService)(&r.common)
+	r.ReleaseProfile = (*ReleaseProfileService)(&r.common)
+	r.RemotePathMapping = (*RemotePathMappingService)(&r.common)
+	r.Rename = (*RenameService)(&r.common)
+	r.RootFolder = (*RootFolderService)(&r.common)
 	r.System = (*SystemService)(&r.common)
 	r.Tag = (*TagService)(&r.common)
-	r.QualityProfile = (*QualityProfileService)(&r.common)
-	r.RootFolder = (*RootFolderService)(&r.common)
-	r.Command = (*CommandService)(&r.common)
+	r.Wanted = (*WantedService)(&r.common)
 
 	return r, nil
 }
@@ -228,9 +286,237 @@ const (
 	SourceTypeIndexer  SourceType = "indexer"
 )
 
+// AuthenticationRequiredType specifies when authentication is required.
+type AuthenticationRequiredType string
+
+// Authentication required type values.
+const (
+	AuthenticationRequiredTypeEnabled                   AuthenticationRequiredType = "enabled"
+	AuthenticationRequiredTypeDisabledForLocalAddresses AuthenticationRequiredType = "disabledForLocalAddresses"
+)
+
+// ProxyType identifies the proxy protocol.
+type ProxyType string
+
+// Proxy type values.
+const (
+	ProxyTypeHTTP   ProxyType = "http"
+	ProxyTypeSocks4 ProxyType = "socks4"
+	ProxyTypeSocks5 ProxyType = "socks5"
+)
+
+// CertificateValidationType controls TLS certificate validation behaviour.
+type CertificateValidationType string
+
+// Certificate validation type values.
+const (
+	CertificateValidationTypeEnabled                   CertificateValidationType = "enabled"
+	CertificateValidationTypeDisabledForLocalAddresses CertificateValidationType = "disabledForLocalAddresses"
+	CertificateValidationTypeDisabled                  CertificateValidationType = "disabled"
+)
+
+// MovieRuntimeFormatType controls how runtimes are displayed.
+type MovieRuntimeFormatType string
+
+// Movie runtime format type values.
+const (
+	MovieRuntimeFormatTypeHoursMinutes MovieRuntimeFormatType = "hoursMinutes"
+	MovieRuntimeFormatTypeMinutes      MovieRuntimeFormatType = "minutes"
+)
+
+// ColonReplacementFormat controls how colons in filenames are handled.
+type ColonReplacementFormat string
+
+// Colon replacement format values.
+const (
+	ColonReplacementFormatDelete         ColonReplacementFormat = "delete"
+	ColonReplacementFormatDash           ColonReplacementFormat = "dash"
+	ColonReplacementFormatSpaceDash      ColonReplacementFormat = "spaceDash"
+	ColonReplacementFormatSpaceDashSpace ColonReplacementFormat = "spaceDashSpace"
+	ColonReplacementFormatSmart          ColonReplacementFormat = "smart"
+)
+
+// ProperDownloadTypes controls how Radarr handles proper/repack releases.
+type ProperDownloadTypes string
+
+// Proper download type values.
+const (
+	ProperDownloadTypesPreferAndUpgrade ProperDownloadTypes = "preferAndUpgrade"
+	ProperDownloadTypesDoNotUpgrade     ProperDownloadTypes = "doNotUpgrade"
+	ProperDownloadTypesDoNotPrefer      ProperDownloadTypes = "doNotPrefer"
+)
+
+// FileDateType controls which date is used as the file modification date.
+type FileDateType string
+
+// File date type values.
+const (
+	FileDateTypeNone    FileDateType = "none"
+	FileDateTypeCinemas FileDateType = "cinemas"
+	FileDateTypeRelease FileDateType = "release"
+)
+
+// RescanAfterRefreshType controls when Radarr rescans the disk after a refresh.
+type RescanAfterRefreshType string
+
+// Rescan after refresh type values.
+const (
+	RescanAfterRefreshTypeAlways      RescanAfterRefreshType = "always"
+	RescanAfterRefreshTypeAfterManual RescanAfterRefreshType = "afterManual"
+	RescanAfterRefreshTypeNever       RescanAfterRefreshType = "never"
+)
+
+// TMDbCountryCode selects the content rating country for TMDb metadata.
+type TMDbCountryCode string
+
+// TMDb country code values.
+const (
+	TMDbCountryCodeAU TMDbCountryCode = "au"
+	TMDbCountryCodeBR TMDbCountryCode = "br"
+	TMDbCountryCodeCA TMDbCountryCode = "ca"
+	TMDbCountryCodeFR TMDbCountryCode = "fr"
+	TMDbCountryCodeDE TMDbCountryCode = "de"
+	TMDbCountryCodeGB TMDbCountryCode = "gb"
+	TMDbCountryCodeIN TMDbCountryCode = "in"
+	TMDbCountryCodeIE TMDbCountryCode = "ie"
+	TMDbCountryCodeIT TMDbCountryCode = "it"
+	TMDbCountryCodeNZ TMDbCountryCode = "nz"
+	TMDbCountryCodeRO TMDbCountryCode = "ro"
+	TMDbCountryCodeES TMDbCountryCode = "es"
+	TMDbCountryCodeUS TMDbCountryCode = "us"
+)
+
+// ExtraFileType identifies the kind of extra file alongside a movie.
+type ExtraFileType string
+
+// Extra file type values.
+const (
+	ExtraFileTypeSubtitle ExtraFileType = "subtitle"
+	ExtraFileTypeMetadata ExtraFileType = "metadata"
+	ExtraFileTypeOther    ExtraFileType = "other"
+)
+
+// ImportListType categorises the source of an import list.
+type ImportListType string
+
+// Import list type values.
+const (
+	ImportListTypeProgram  ImportListType = "program"
+	ImportListTypeTMDb     ImportListType = "tmdb"
+	ImportListTypeTrakt    ImportListType = "trakt"
+	ImportListTypePlex     ImportListType = "plex"
+	ImportListTypeSimkl    ImportListType = "simkl"
+	ImportListTypeOther    ImportListType = "other"
+	ImportListTypeAdvanced ImportListType = "advanced"
+)
+
+// RejectionType indicates whether a rejection is permanent or temporary.
+type RejectionType string
+
+// Rejection type values.
+const (
+	RejectionTypePermanent RejectionType = "permanent"
+	RejectionTypeTemporary RejectionType = "temporary"
+)
+
+// PrivacyLevel controls how sensitive a provider field is.
+type PrivacyLevel string
+
+// Privacy level values.
+const (
+	PrivacyLevelNormal   PrivacyLevel = "normal"
+	PrivacyLevelPassword PrivacyLevel = "password"
+	PrivacyLevelAPIKey   PrivacyLevel = "apiKey"
+	PrivacyLevelUserName PrivacyLevel = "userName"
+)
+
+// ProviderMessageType is the severity of a provider status message.
+type ProviderMessageType string
+
+// Provider message type values.
+const (
+	ProviderMessageTypeInfo    ProviderMessageType = "info"
+	ProviderMessageTypeWarning ProviderMessageType = "warning"
+	ProviderMessageTypeError   ProviderMessageType = "error"
+)
+
+// ApplyTags controls how tags are merged during bulk updates.
+type ApplyTags string
+
+// Apply tags values.
+const (
+	ApplyTagsAdd     ApplyTags = "add"
+	ApplyTagsRemove  ApplyTags = "remove"
+	ApplyTagsReplace ApplyTags = "replace"
+)
+
+// CreditType distinguishes cast members from crew members.
+type CreditType string
+
+// Credit type values.
+const (
+	CreditTypeCast CreditType = "cast"
+	CreditTypeCrew CreditType = "crew"
+)
+
 // ---------------------------------------------------------------------------
 // Shared value types
 // ---------------------------------------------------------------------------
+
+// SelectOption is a selectable item in a provider configuration dropdown.
+type SelectOption struct {
+	Value        int     `json:"value"`
+	Name         *string `json:"name,omitempty"`
+	Order        int     `json:"order"`
+	Hint         *string `json:"hint,omitempty"`
+	DividerAfter bool    `json:"dividerAfter"`
+}
+
+// Field is a single configuration field within a provider resource.
+type Field struct {
+	Order                       int            `json:"order"`
+	Name                        *string        `json:"name,omitempty"`
+	Label                       *string        `json:"label,omitempty"`
+	Unit                        *string        `json:"unit,omitempty"`
+	HelpText                    *string        `json:"helpText,omitempty"`
+	HelpTextWarning             *string        `json:"helpTextWarning,omitempty"`
+	HelpLink                    *string        `json:"helpLink,omitempty"`
+	Value                       any            `json:"value,omitempty"`
+	Type                        *string        `json:"type,omitempty"`
+	Advanced                    bool           `json:"advanced"`
+	SelectOptions               []SelectOption `json:"selectOptions,omitempty"`
+	SelectOptionsProviderAction *string        `json:"selectOptionsProviderAction,omitempty"`
+	Section                     *string        `json:"section,omitempty"`
+	Hidden                      *string        `json:"hidden,omitempty"`
+	Privacy                     PrivacyLevel   `json:"privacy,omitempty"`
+	Placeholder                 *string        `json:"placeholder,omitempty"`
+	IsFloat                     bool           `json:"isFloat"`
+}
+
+// ProviderMessage is a status message returned by a provider resource.
+type ProviderMessage struct {
+	Message *string             `json:"message,omitempty"`
+	Type    ProviderMessageType `json:"type,omitempty"`
+}
+
+// ImportRejectionResource describes why a release was rejected during import.
+type ImportRejectionResource struct {
+	Reason *string       `json:"reason,omitempty"`
+	Type   RejectionType `json:"type,omitempty"`
+}
+
+// CustomFormatSpecificationSchema is a specification rule within a custom format.
+type CustomFormatSpecificationSchema struct {
+	ID                 int                               `json:"id"`
+	Name               *string                           `json:"name,omitempty"`
+	Implementation     *string                           `json:"implementation,omitempty"`
+	ImplementationName *string                           `json:"implementationName,omitempty"`
+	InfoLink           *string                           `json:"infoLink,omitempty"`
+	Negate             bool                              `json:"negate"`
+	Required           bool                              `json:"required"`
+	Fields             []Field                           `json:"fields,omitempty"`
+	Presets            []CustomFormatSpecificationSchema `json:"presets,omitempty"`
+}
 
 // Language represents an audio or subtitle language.
 type Language struct {
@@ -294,9 +580,10 @@ type QualityModel struct {
 
 // CustomFormat is a user-defined scoring rule applied to releases.
 type CustomFormat struct {
-	ID                              int     `json:"id"`
-	Name                            *string `json:"name,omitempty"`
-	IncludeCustomFormatWhenRenaming *bool   `json:"includeCustomFormatWhenRenaming,omitempty"`
+	ID                              int                               `json:"id"`
+	Name                            *string                           `json:"name,omitempty"`
+	IncludeCustomFormatWhenRenaming *bool                             `json:"includeCustomFormatWhenRenaming,omitempty"`
+	Specifications                  []CustomFormatSpecificationSchema `json:"specifications,omitempty"`
 }
 
 // MediaInfo holds technical metadata about the video and audio streams.

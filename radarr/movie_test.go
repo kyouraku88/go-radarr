@@ -157,6 +157,111 @@ func TestMovieService_Delete_Options(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestMovieService_Lookup(t *testing.T) {
+	t.Parallel()
+
+	want := []radarr.Movie{
+		{ID: 0, TmdbID: 550, Title: new("Fight Club")},
+	}
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /api/v3/movie/lookup", func(w http.ResponseWriter, r *http.Request) {
+		assertAPIKey(t, r)
+		assert.Equal(t, "fight club", r.URL.Query().Get("term"))
+		writeJSON(w, http.StatusOK, want)
+	})
+
+	c := newTestClient(t, mux)
+	got, err := c.Movie.Lookup(t.Context(), radarr.WithLookupTerm("fight club"))
+	require.NoError(t, err)
+	require.Len(t, got, 1)
+	require.NotNil(t, got[0].Title)
+	assert.Equal(t, "Fight Club", *got[0].Title)
+}
+
+func TestMovieService_LookupByIMDB(t *testing.T) {
+	t.Parallel()
+
+	want := []radarr.Movie{{ID: 0, TmdbID: 550, Title: new("Fight Club")}}
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /api/v3/movie/lookup/imdb", func(w http.ResponseWriter, r *http.Request) {
+		assertAPIKey(t, r)
+		assert.Equal(t, "tt0137523", r.URL.Query().Get("imdbId"))
+		writeJSON(w, http.StatusOK, want)
+	})
+
+	c := newTestClient(t, mux)
+	got, err := c.Movie.LookupByIMDB(t.Context(), "tt0137523")
+	require.NoError(t, err)
+	require.Len(t, got, 1)
+	require.NotNil(t, got[0].Title)
+	assert.Equal(t, "Fight Club", *got[0].Title)
+}
+
+func TestMovieService_LookupByTMDB(t *testing.T) {
+	t.Parallel()
+
+	want := []radarr.Movie{{ID: 0, TmdbID: 550, Title: new("Fight Club")}}
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /api/v3/movie/lookup/tmdb", func(w http.ResponseWriter, r *http.Request) {
+		assertAPIKey(t, r)
+		assert.Equal(t, "550", r.URL.Query().Get("tmdbId"))
+		writeJSON(w, http.StatusOK, want)
+	})
+
+	c := newTestClient(t, mux)
+	got, err := c.Movie.LookupByTMDB(t.Context(), 550)
+	require.NoError(t, err)
+	require.Len(t, got, 1)
+	assert.Equal(t, 550, got[0].TmdbID)
+}
+
+func TestMovieService_Import(t *testing.T) {
+	t.Parallel()
+
+	body := []radarr.Movie{
+		{TmdbID: 550, QualityProfileID: 1, Title: new("Fight Club")},
+		{TmdbID: 157336, QualityProfileID: 1, Title: new("Interstellar")},
+	}
+	want := []radarr.Movie{
+		{ID: 10, TmdbID: 550, Title: new("Fight Club")},
+		{ID: 11, TmdbID: 157336, Title: new("Interstellar")},
+	}
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("POST /api/v3/movie/import", func(w http.ResponseWriter, _ *http.Request) {
+		writeJSON(w, http.StatusOK, want)
+	})
+
+	c := newTestClient(t, mux)
+	got, err := c.Movie.Import(t.Context(), body)
+	require.NoError(t, err)
+	require.Len(t, got, 2)
+	assert.Equal(t, 10, got[0].ID)
+	assert.Equal(t, 11, got[1].ID)
+}
+
+func TestMovieService_GetFolder(t *testing.T) {
+	t.Parallel()
+
+	want := radarr.Movie{ID: 42, TmdbID: 550, Title: new("Fight Club")}
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("GET /api/v3/movie/42/folder", func(w http.ResponseWriter, r *http.Request) {
+		assertAPIKey(t, r)
+		writeJSON(w, http.StatusOK, want)
+	})
+
+	c := newTestClient(t, mux)
+	got, err := c.Movie.GetFolder(t.Context(), 42)
+	require.NoError(t, err)
+	assert.Equal(t, 42, got.ID)
+	require.NotNil(t, got.Title)
+	assert.Equal(t, "Fight Club", *got.Title)
+}
+
 func TestMovieService_Get_Error(t *testing.T) {
 	t.Parallel()
 

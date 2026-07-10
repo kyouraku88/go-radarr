@@ -8,16 +8,6 @@ import (
 // MovieEditorService provides bulk edit and delete methods for the /movie/editor endpoint.
 type MovieEditorService service
 
-// ApplyTags controls how tags are merged with existing ones during a bulk edit.
-type ApplyTags string
-
-// Apply tags values.
-const (
-	ApplyTagsAdd     ApplyTags = "add"
-	ApplyTagsRemove  ApplyTags = "remove"
-	ApplyTagsReplace ApplyTags = "replace"
-)
-
 // MovieEditorRequest is the body for bulk-edit and bulk-delete operations.
 type MovieEditorRequest struct {
 	MovieIDs            []int           `json:"movieIds,omitempty"`
