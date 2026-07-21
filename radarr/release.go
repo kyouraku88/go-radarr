@@ -57,7 +57,7 @@ type Release struct {
 	Seeders             *int             `json:"seeders,omitempty"`
 	Leechers            *int             `json:"leechers,omitempty"`
 	Protocol            DownloadProtocol `json:"protocol,omitempty"`
-	IndexerFlags        *int             `json:"indexerFlags,omitempty"`
+	IndexerFlags        []string         `json:"indexerFlags,omitempty"`
 	MovieID             *int             `json:"movieId,omitempty"`
 	DownloadClientID    *int             `json:"downloadClientId,omitempty"`
 	DownloadClient      *string          `json:"downloadClient,omitempty"`
