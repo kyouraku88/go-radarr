@@ -1,4 +1,4 @@
-module github.com/bsido/go-radarr
+module github.com/kyouraku88/go-radarr
 
 go 1.26
 

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bsido/go-radarr/radarr"
+	"github.com/kyouraku88/go-radarr/radarr"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
