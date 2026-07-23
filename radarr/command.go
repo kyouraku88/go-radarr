@@ -75,6 +75,25 @@ type CommandBody struct {
 	ClientUserAgent     *string        `json:"clientUserAgent,omitempty"`
 }
 
+// ManualImportCommandFile is a single file entry for a ManualImport command.
+type ManualImportCommandFile struct {
+	Path         string       `json:"path"`
+	FolderName   string       `json:"folderName,omitempty"`
+	MovieID      int          `json:"movieId"`
+	ReleaseGroup string       `json:"releaseGroup,omitempty"`
+	Quality      QualityModel `json:"quality"`
+	Languages    []Language   `json:"languages,omitempty"`
+	IndexerFlags int          `json:"indexerFlags,omitempty"`
+	DownloadID   string       `json:"downloadId,omitempty"`
+}
+
+// manualImportCommandRequest is the body for a ManualImport command.
+type manualImportCommandRequest struct {
+	Name       string                     `json:"name"`
+	Files      []ManualImportCommandFile  `json:"files"`
+	ImportMode string                     `json:"importMode,omitempty"`
+}
+
 // CommandRecord represents a queued or completed Radarr command.
 type CommandRecord struct {
 	ID                  int             `json:"id"`
@@ -155,6 +174,24 @@ func (s *CommandService) Create(ctx context.Context, body CommandRecord) (*Comma
 
 	if err := checkResponse(resp); err != nil {
 		return nil, fmt.Errorf("radarr: create command: %w", err)
+	}
+
+	return ptrResult[CommandRecord](resp)
+}
+
+// ManualImport dispatches a ManualImport command, completing manual import for one or more files.
+func (s *CommandService) ManualImport(ctx context.Context, files []ManualImportCommandFile, importMode string) (*CommandRecord, error) {
+	resp, err := s.client.R().
+		SetContext(ctx).
+		SetResult(&CommandRecord{}).
+		SetBody(manualImportCommandRequest{Name: "ManualImport", Files: files, ImportMode: importMode}).
+		Post("/api/v3/command")
+	if err != nil {
+		return nil, fmt.Errorf("radarr: manual import command: %w", err)
+	}
+
+	if err := checkResponse(resp); err != nil {
+		return nil, fmt.Errorf("radarr: manual import command: %w", err)
 	}
 
 	return ptrResult[CommandRecord](resp)
